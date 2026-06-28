@@ -181,35 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
         drawSticks();
     }
 
-
-
-    // da chaiamare sia per stick a dx che a sinistra
-    let isStickTouchingUpBorder = (yPos  , target) => {
-        return yPos <= target
-    }
-    let isStickTouchingBottomBorder = (yPos , target) => {
-
-    }
-    // // controllo che sticks non escano dai bordi della canvas
-    // let isStickTouchingCanvasBorder = () => {
-    //     if (leftStick_yPos <= 0){
-    //         KEY_STATES.W = 0
-    //         isLeftSticktouchingTopBorder = true;
-    //     }
-    //     if (leftStick_yPos <= 0){
-    //         KEY_STATES.W = 0
-    //         isLeftSticktouchingTopBorder = true;
-    //     }
-    //     if (leftStick_yPos <= 0){
-    //         KEY_STATES.W = 0
-    //         isLeftSticktouchingTopBorder = true;
-    //     }
-    //     if (leftStick_yPos <= 0){
-    //         KEY_STATES.W = 0
-    //         isLeftSticktouchingTopBorder = true;
-    //     }
-    // }
-
     let moveBall = () => {
         xPosBall += VEL_X_BALL;
         yPosBall += VEL_Y_BALL;
@@ -228,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 1. GESTIONE ASSE X (Rimbalzo sui bordi laterali)
 
         // Toccato il bordo sinistro? Inverti VEL_X facendola diventare positiva
-        if (xPosBall - BALL_SIZE <= leftStick_xPos ) {
+        if ((xPosBall - BALL_SIZE <= leftStick_xPos) && ( yPosBall - BALL_SIZE <= leftStick_yPos ) ) {
             VEL_X_BALL = Math.abs(VEL_X_BALL);
             changeBallColor();
         }
