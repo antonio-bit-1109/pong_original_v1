@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("canvas");
+    let pointLeftStickHTML = document.getElementById("pointLfStick");
+    let pointRightStickHTML = document.getElementById("pointRxStick");
+    let scoreLeft = 0;
+    let scoreRight = 0;
     const canvasContext = canvas.getContext("2d");
 
     const centerX = canvas.width / 2;
@@ -110,9 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
         canvasContext.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    let drawSfondo = () => {
-        createRect(0, 0, canvas.width, canvas.height, "black");
-    }
 
     let drawBall = (color) => {
         if (color === null){
@@ -145,10 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Funzione di disegno
     let draw = () => {
         clearCanvas();
-        drawSfondo();
         drawBall(choosenBallColor);
         drawSticks()
-
     };
 
     let drawSticks = () => {
@@ -159,7 +158,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let update = () => {
         moveBall();
         bounce();
-        updateSticksPosition()
+        updateSticksPosition();
+        showCurrentPoints()
     };
 
     // controllo valori prop oggetto che registra se tasto di spostamento stick è sttao premuto o no
@@ -194,39 +194,80 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // gestione assi separatamente
     let bounce = () => {
-        // 1. GESTIONE ASSE X (Rimbalzo sui bordi laterali)
+        // 1. GESTIONE ASSE X E COLLISIONI CON GLI STICK
 
-        // Toccato il bordo sinistro? Inverti VEL_X facendola diventare positiva
-        if ((xPosBall - BALL_SIZE <= leftStick_xPos) && ( yPosBall - BALL_SIZE <= leftStick_yPos ) ) {
-            VEL_X_BALL = Math.abs(VEL_X_BALL);
+        // --- COLLISIONE STICK SINISTRO ---
+        // La palla tocca lo stick sinistro se:
+        // - La sinistra della palla supera la destra dello stick
+        // - La destra della palla è dopo la sinistra dello stick
+        // - La Y della palla è all'interno dell'altezza dello stick
+        if (xPosBall <= leftStick_xPos + STICK_WIDTH &&
+            xPosBall + BALL_SIZE >= leftStick_xPos &&
+            yPosBall + BALL_SIZE >= leftStick_yPos &&
+            yPosBall <= leftStick_yPos + STICK_HEIGHT) {
+
+            VEL_X_BALL = Math.abs(VEL_X_BALL); // Forza direzione verso destra
             changeBallColor();
         }
-            // Toccato il bordo destro? (considerando la dimensione della palla)
-        // Inverti VEL_X facendola diventare negativa
-        else if (xPosBall + BALL_SIZE >= rightStick_xPos) {
-            VEL_X_BALL = -Math.abs(VEL_X_BALL);
+
+            // --- COLLISIONE STICK DESTRO ---
+        // Stessa logica, ma per le coordinate dello stick destro
+        else if (xPosBall + BALL_SIZE >= rightStick_xPos &&
+            xPosBall <= rightStick_xPos + STICK_WIDTH &&
+            yPosBall + BALL_SIZE >= rightStick_yPos &&
+            yPosBall <= rightStick_yPos + STICK_HEIGHT) {
+
+            VEL_X_BALL = -Math.abs(VEL_X_BALL); // Forza direzione verso sinistra
             changeBallColor();
         }
 
         // 2. GESTIONE ASSE Y (Rimbalzo sul bordo superiore e inferiore)
-
-        // Toccato il bordo superiore (y = 0)? Inverti VEL_Y facendola diventare positiva
+        // Toccato il bordo superiore?
         if (yPosBall <= 0) {
             VEL_Y_BALL = Math.abs(VEL_Y_BALL);
             changeBallColor();
         }
-            // Toccato il bordo inferiore? (considerando la dimensione della palla)
-        // Inverti VEL_Y facendola diventare negativa
+        // Toccato il bordo inferiore?
         else if (yPosBall + BALL_SIZE >= canvas.height) {
             VEL_Y_BALL = -Math.abs(VEL_Y_BALL);
             changeBallColor();
         }
+
+        // se non si verifica nessuna di queste condizioni allora la palla ha superato gli stick e ha fatto gol in uno dei due campi
+        if (xPosBall < 0){
+            resetBall(centerX , centerY )
+            addPoint(true)
+        }
+        else if (xPosBall > canvas.width){
+            resetBall(centerX , centerY )
+            addPoint(false)
+        }
+
+        console.log("x palla" + xPosBall)
+        console.log("y palla" + yPosBall)
     }
 
+    let resetBall = ( ) => {
+        xPosBall = centerX;
+        yPosBall = centerY;
+        VEL_Y_BALL = - Math.abs(VEL_Y_BALL);
+    }
 
+    let addPoint = (hasBallSurpassedLeft) => {
 
+        if (hasBallSurpassedLeft){
+            scoreRight++
+        } else {
+            scoreLeft++
+        }
+
+    }
+
+    let showCurrentPoints = () => {
+        pointLeftStickHTML.innerText = `${scoreLeft}`
+        pointRightStickHTML.innerText = `${scoreRight}`
+    }
     // Fai partire il loop per la prima volta
     requestAnimationFrame(mainLoop);
 });

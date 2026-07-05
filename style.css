@@ -1,0 +1,13 @@
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    color: black; /* Per farlo spiccare su sfondo nero */
+}
+
+#canvas {
+    /* Metti il percorso della tua immagine qui */
+    background-image: url('/assets/capa_sfondo_orbit.webp');
+    background-size: cover; /* Fa tutto il lavoro magico per te! */
+    background-position: center;
+    background-repeat: no-repeat;
+}
