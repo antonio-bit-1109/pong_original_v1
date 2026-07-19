@@ -6,7 +6,7 @@ body {
 
 #canvas {
     /* Metti il percorso della tua immagine qui */
-    background-image: url('/assets/capa_sfondo_orbit.webp');
+    background-image: url('/assets/caparezza-orbit-orbit.jpg');
     background-size: cover; /* Fa tutto il lavoro magico per te! */
     background-position: center;
     background-repeat: no-repeat;

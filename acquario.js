@@ -1,4 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+    const mioAudio = new Audio('/assets/audio/Caparezza_abiura_di_me.mp3');
+
+    mioAudio.addEventListener('canplaythrough', () => {
+        console.log("Audio caricato. pronto a partire non appena un giocatore interagisce con il browser.")
+    });
+
+    let isAudioStartedOnce = false;
+
+    let ballImageReady = false;
+    let ballImage = new Image();
+    ballImage.src = "/assets/capa_head_no_bg.png";
+
+    ballImage.onload = function() {
+
+        ballImageReady = true;
+    };
+
     const canvas = document.getElementById("canvas");
     let pointLeftStickHTML = document.getElementById("pointLfStick");
     let pointRightStickHTML = document.getElementById("pointRxStick");
@@ -9,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const centerX = canvas.width / 2;
     const centerY  = canvas.height / 2;
     const ONE_BLOCK_SIZE = 50;
-    const BALL_SIZE = 15;
+    const BALL_SIZE = 45;
     const BALL_COLORS = ["cyan" , "white" , "red" , "yellow" , "green"]
     const STICK_WIDTH = 10;
     const STICK_HEIGHT = 100;
@@ -23,9 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Variabili di stato (esempio per vedere qualcosa muoversi)
     let xPosBall = 0;
     let yPosBall = 0;
-    let VEL_X_BALL = 2;
-    let VEL_Y_BALL = 2;
-    let VEL_Y_STICK = 5;
+    let VEL_X_BALL = 6;
+    let VEL_Y_BALL = 6;
+    let VEL_Y_STICK = 8;
     let choosenBallColor = null;
 
     // posizione stick left iniziale
@@ -35,6 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // posizione stick right iniziale
     let rightStick_xPos = 780;
     let rightStick_yPos = centerY;
+
+    // copia della posizione iniziale delle y dello stick Dx e Sn
+
 
     let getRandomColor = () => {
         let i = Math.floor(Math.random()* BALL_COLORS.length)
@@ -98,15 +119,31 @@ document.addEventListener("DOMContentLoaded", () => {
         canvasContext.fillRect(x, y, width, height);
     };
 
+    let drawImage = (source , x, y ,largh , alt) => {
+        canvasContext.drawImage(source , x , y , largh , alt)
+    }
+
     // Il Loop Principale
     let mainLoop = () => {
         console.log(KEY_STATES);
         update(); // Calcola le nuove posizioni
         draw();   // Disegna tutto
+        hasPLayerInteractedWithBrowser();
         // Richiama ricorsivamente il loop per il prossimo frame
         requestAnimationFrame(mainLoop);
     };
 
+
+    // controllo se uno degli stick è stato mosso cosi da far partire l audio
+    let hasPLayerInteractedWithBrowser = () => {
+
+        if (mioAudio.paused && isAudioStartedOnce) return;
+
+        if ( (leftStick_yPos !== centerY || rightStick_yPos !== centerY) && !isAudioStartedOnce ){
+            isAudioStartedOnce = true;
+            mioAudio.play();
+        }
+    }
 
      // FUNZIONI PRINCIPALI
 
@@ -122,7 +159,11 @@ document.addEventListener("DOMContentLoaded", () => {
             choosenBallColor = color
         }
 
-        createRect(xPosBall , yPosBall , BALL_SIZE, BALL_SIZE, color !== null ? color : choosenBallColor);
+        if (ballImageReady){
+            drawImage(ballImage ,xPosBall,yPosBall , BALL_SIZE , BALL_SIZE )
+        }else {
+            createRect(xPosBall , yPosBall , BALL_SIZE, BALL_SIZE, color !== null ? color : choosenBallColor);
+        }
     }
 
 
